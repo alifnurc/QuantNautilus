@@ -72,6 +72,12 @@ if __name__ == "__main__":
     # Seet column `timestamp` as index
     df = df.set_index("Timestamp")
 
+    # DEBUG:
+    print("\nData summary:")
+    print(df.describe())
+    print("\nMissing values:")
+    print(df.isnull().sum())
+
     # Step 4c: Define type of loaded bars
     EURUSD_15MIN_BARTYPE = BarType.from_str(
         f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL",
