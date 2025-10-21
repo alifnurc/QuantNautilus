@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
-from decimal import Decimal
-from pathlib import Path
 
 import pandas as pd
 import zipfile
 import requests
 
+from decimal import Decimal
+from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-from nautilus_trader.examples.strategies.ema_cross import EMACross, EMACrossConfig
 from nautilus_trader.model import Bar, BarType, Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.persistence.wranglers import BarDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
+from strategies.pdhl import PDHLConfig, PDHLStrategy
 
 
 def download(url: str) -> None:
@@ -61,50 +61,37 @@ if __name__ == "__main__":
     csv_file_path = r"Exness_EURUSDc_2025_09.csv"
     df = pd.read_csv(csv_file_path, sep=",", decimal=".", header=0, index_col=False)
 
-    # Step 4b: Restructure DataFrame into required structure, that can be bassed `BarDataWrangler`
-    #   -   5 columns: 'open', 'high', 'low', 'close', 'volume'
+    # Step 4b: Restructure DataFrame into required structure
+    #   -   2 columns: 'Bid', 'Ask'
     #   -   'timestamp' as index
 
+    # Change order of columns
+    df = df.reindex(columns=["Timestamp", "Bid", "Ask"])
     # Convert string timestamps into datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Seet column `timestamp` as index
     df = df.set_index("Timestamp")
-    # MID price for OHLC
-    df["Mid"] = (df["Bid"] + df["Ask"]) / 2
-
-    ohlc_df = (
-        df["Mid"]
-        .resample("15min")
-        .agg({"open": "first", "high": "max", "low": "min", "close": "last"})
-    )
-    # Add volume
-    ohlc_df["volume"] = df.resample("15min").size()
-
-    # Remove volume = 0 (no data tick in that periode)
-    ohlc_df_clean = ohlc_df[ohlc_df["volume"] > 0].copy()
 
     # Step 4c: Define type of loaded bars
     EURUSD_15MIN_BARTYPE = BarType.from_str(
-        f"{EURUSD_INSTRUMENT.id}-15-MINUTE-MID-EXTERNAL",
+        f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL",
     )
 
     # Step 4d: `BarDataWrangler` converts each row object of type `Bar`
     wrangler = BarDataWrangler(EURUSD_15MIN_BARTYPE, EURUSD_INSTRUMENT)
-    eurusdc_15min_bars_list: list[Bar] = wrangler.process(ohlc_df_clean)
+    eurusdc_15min_bars_list: list[Bar] = wrangler.process(df)
 
     # Step 4e: Add loaded data to the engine
     engine.add_data(eurusdc_15min_bars_list)
 
     # Step 5: Create strategy and add it to engine
-    config = EMACrossConfig(
+    config = PDHLConfig(
         instrument_id=EURUSD_INSTRUMENT.id,
         bar_type=BarType.from_str(f"{EURUSD_INSTRUMENT.id}-15-MINUTE-MID-EXTERNAL"),
-        fast_ema_period=10,
-        slow_ema_period=20,
         trade_size=Decimal(10_000),
     )
 
-    strategy = EMACross(config=config)
+    strategy = PDHLStrategy(config=config)
     engine.add_strategy(strategy=strategy)
 
     # Step 6: Run engine = Run backtest
