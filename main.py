@@ -61,7 +61,7 @@ if __name__ == "__main__":
     df = pd.read_csv(
         csv_file_path,
         index_col=False,
-        header=None,
+        header=0,
         sep=",",
         decimal=".",
         names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     )
 
     # Convert string timestamps into datetime
-    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="mixed")
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Seet column `Timestamp` as index
     df = df.set_index("Timestamp")
 
