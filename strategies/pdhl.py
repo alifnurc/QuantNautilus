@@ -31,7 +31,7 @@ class PDHLStrategy(Strategy):
 
         # Request historical data and subscribe to live data
         self.request_bars(bar_type)
-        self.subscribe_bars(bar_type)
+        self.subscribe(bar_type)
 
     def on_stop(self):
         self.log.info("Strategy stopped")

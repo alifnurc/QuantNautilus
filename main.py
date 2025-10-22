@@ -8,10 +8,10 @@ from decimal import Decimal
 from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-from nautilus_trader.model import BarType, Money, TraderId, Venue
+from nautilus_trader.model import Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
-from nautilus_trader.persistence.wranglers import BarDataWrangler
+from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 from strategies.pdhl import PDHLConfig, PDHLStrategy
 
@@ -78,12 +78,11 @@ if __name__ == "__main__":
     df = df.set_index("timestamp")
 
     # Step 4c: Process quotes using a wrangler
-    bar_type = BarType.from_str(f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL")
-    wrangler = BarDataWrangler(bar_type, EURUSD_INSTRUMENT)
-    bars = wrangler.process(df)
+    wrangler = QuoteTickDataWrangler(instrument=EURUSD_INSTRUMENT)
+    ticks = wrangler.process(df)
 
     # Step 4d: Add loaded data to the engine
-    engine.add_data(bars)
+    engine.add_data(ticks)
 
     # Step 5: Create strategy and add it to engine
     config = PDHLConfig(
