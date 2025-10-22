@@ -77,6 +77,9 @@ if __name__ == "__main__":
     df = df.sort_index()
     df.head(2)
 
+    # DEBUG
+    print(df)
+
     # Step 4c: Define type of loaded bars
     EURUSD_15MIN_BARTYPE = BarType.from_str(
         f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL",
