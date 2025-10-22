@@ -61,7 +61,7 @@ if __name__ == "__main__":
     csv_file_path = r"Exness_EURUSDc_2025_09.csv"
     df = CSVTickDataLoader.load(
         file_path=csv_file_path,
-        index_col=False,
+        index_col=0,
         header=None,
         names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
         usecols=["Timestamp", "Bid", "Ask"],
