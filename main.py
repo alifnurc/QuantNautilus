@@ -9,10 +9,11 @@ from decimal import Decimal
 from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-from nautilus_trader.model import Bar, BarType, Money, TraderId, Venue
+from nautilus_trader.model import BarType, Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
+from nautilus_trader.persistence.loaders import CSVTickDataLoader
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 from strategies.pdhl import PDHLConfig, PDHLStrategy
 
@@ -59,31 +60,28 @@ if __name__ == "__main__":
 
     # Step 4a: Load bar data from CSV file -> into pandas DataFrame
     csv_file_path = r"Exness_EURUSDc_2025_09.csv"
-    df = pd.read_csv(csv_file_path, sep=",", decimal=".", header=0, index_col=False)
+    df = CSVTickDataLoader.load(
+        file_path=csv_file_path,
+        index_col=0,
+        header=None,
+        names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
+        usecols=["Timestamp", "Bid", "Ask"],
+        parse_dates=True,
+        date_format="ISO8601",
+    )
 
-    # Step 4b: Restructure DataFrame into required structure
-    #   -   2 columns: 'Bid', 'Ask'
-    #   -   'timestamp' as index
-
-    # Change order of columns
-    df = df.reindex(columns=["Timestamp", "Bid", "Ask"])
-    # Convert string timestamps into datetime
-    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
-    # Seet column `timestamp` as index
-    df = df.set_index("Timestamp")
+    # Step 4b: Reconstructure DataFrame to ensure data are sorted by timestamp
+    df = df.sort_index()
+    df.head(2)
 
     # Step 4c: Define type of loaded bars
     EURUSD_15MIN_BARTYPE = BarType.from_str(
         f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL",
     )
 
-    # Step 4d: `BarDataWrangler` converts each row object of type `Bar`
-    # wrangler = BarDataWrangler(EURUSD_15MIN_BARTYPE, EURUSD_INSTRUMENT)
+    # Step 4d: Process quotes using a wrangler
     wrangler = QuoteTickDataWrangler(instrument=EURUSD_INSTRUMENT)
-    ticks = wrangler.process_bar_data(
-        bid_data=df["Bid"], ask_data=df["Ask"]
-    )
-    # eurusdc_15min_bars_list: list[Bar] = wrangler.process(df)
+    ticks = wrangler.process(df)
 
     # Step 4e: Add loaded data to the engine
     engine.add_data(ticks)
