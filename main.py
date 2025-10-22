@@ -2,7 +2,6 @@
 
 
 import pandas as pd
-import numpy as np
 import zipfile
 import requests
 
@@ -72,48 +71,6 @@ if __name__ == "__main__":
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Seet column `timestamp` as index
     df = df.set_index("Timestamp")
-
-    # DEBUG:
-    print("\nData summary:")
-    print(df.describe())
-    print("\nMissing values:")
-    print(df.isnull().sum())
-
-    print("\n1. DATAFRAME INFO:")
-    print(f"   Shape: {df.shape}")
-    print(f"   Columns: {df.columns.tolist()}")
-    print(f"   Index type: {type(df.index)}")
-    print(f"   Index name: {df.index.name}")
-    print(f"   Date range: {df.index.min()} to {df.index.max()}")
-    print(f"   Total unique timestamps: {df.index.nunique()}")
-
-    print("\n2. TIMESTAMP ANALYSIS:")
-    if not isinstance(df.index, pd.DatetimeIndex):
-        print("Index is not DatetimeIndex!")
-        # Convert to datetime index
-        df.index = pd.to_datetime(df.index)
-        print("Converted to DatetimeIndex")
-
-    print("\n3. DATA QUALITY CHECK:")
-    duplicate_timestamps = df.index.duplicated().sum()
-    print(f"   Duplicate timestamps: {duplicate_timestamps}")
-    is_sorted = df.index.is_monotonic_increasing
-    print(f"   Index is sorted: {is_sorted}")
-
-    print("\n4. DATA VALIDITY CHECK:")
-    print(f"   NaN in Bid: {df['Bid'].isna().sum()}")
-    print(f"   NaN in Ask: {df['Ask'].isna().sum()}")
-    print(f"   Inf in Bid: {np.isinf(df['Bid']).sum()}")
-    print(f"   Inf in Ask: {np.isinf(df['Ask']).sum()}")
-
-    print("\n5. DATA TYPES AND RANGES:")
-    print(f"   Bid dtype: {df['Bid'].dtype}")
-    print(f"   Ask dtype: {df['Ask'].dtype}")
-    print(f"   Bid range: {df['Bid'].min():.6f} to {df['Bid'].max():.6f}")
-    print(f"   Ask range: {df['Ask'].min():.6f} to {df['Ask'].max():.6f}")
-
-    print("\n6. SAMPLE DATA (first 5 rows):")
-    print(df.head())
 
     # Step 4c: Define type of loaded bars
     EURUSD_15MIN_BARTYPE = BarType.from_str(
