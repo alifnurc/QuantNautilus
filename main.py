@@ -64,22 +64,14 @@ if __name__ == "__main__":
         header=None,
         sep=",",
         decimal=".",
-        dtype={
-            "Bid": "float64",
-            "Ask": "float64",
-        },
+        names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
+        usecols=["Timestamp", "Bid", "Ask"],
     )
 
-    # Change order of columns
-    df = df.reindex(columns=["Timestamp", "Bid", "Ask"])
     # Convert string timestamps into datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Seet column `Timestamp` as index
     df = df.set_index("Timestamp")
-
-    # Step 4b: Reconstructure DataFrame to ensure data are sorted by timestamp
-    df = df.sort_index()
-    df.head(2)
 
     # DEBUG
     print(df)
