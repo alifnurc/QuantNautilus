@@ -71,8 +71,10 @@ if __name__ == "__main__":
 
     # Convert string timestamps into datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
+    # Rename column to required name
+    df = df.rename(columns={"Timestamp": "timestamp", "Bid": "bid_price", "Ask": "ask_price"})
     # Seet column `Timestamp` as index
-    df = df.set_index("Timestamp")
+    df = df.set_index("timestamp")
 
     # DEBUG
     print(df)
