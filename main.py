@@ -12,7 +12,6 @@ from nautilus_trader.model import BarType, Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
-from nautilus_trader.persistence.loaders import CSVTickDataLoader
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 from strategies.pdhl import PDHLConfig, PDHLStrategy
 
@@ -59,17 +58,16 @@ if __name__ == "__main__":
 
     # Step 4a: Load bar data from CSV file -> into pandas DataFrame
     csv_file_path = r"Exness_EURUSDc_2025_09.csv"
-    df = CSVTickDataLoader.load(
-        file_path=csv_file_path,
-        index_col=0,
+    df = pd.read_csv(
+        csv_file_path,
+        index_col=False,
         header=None,
-        names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
-        usecols=["Timestamp", "Bid", "Ask"],
-        parse_dates=True,
         sep=",",
         decimal=".",
     )
 
+    # Change order of columns
+    df = df.reindex(columns=["Timestamp", "Bid", "Ask"])
     # Convert string timestamps into datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Seet column `Timestamp` as index
