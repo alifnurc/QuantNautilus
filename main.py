@@ -70,7 +70,7 @@ if __name__ == "__main__":
     )
 
     # Convert string timestamps into datetime
-    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="MIXED")
     # Seet column `Timestamp` as index
     df = df.set_index("Timestamp")
 
