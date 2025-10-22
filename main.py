@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import pandas as pd
 import zipfile
 import requests
@@ -62,14 +61,19 @@ if __name__ == "__main__":
     csv_file_path = r"Exness_EURUSDc_2025_09.csv"
     df = CSVTickDataLoader.load(
         file_path=csv_file_path,
+        index_col=False,
         header=None,
+        names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
         usecols=["Timestamp", "Bid", "Ask"],
         parse_dates=True,
         sep=",",
         decimal=".",
-        index_col="Timestamp",
-        date_parser=lambda x: pd.to_datetime(x, format="ISO8601"),
     )
+
+    # Convert string timestamps into datetime
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
+    # Seet column `Timestamp` as index
+    df = df.set_index("Timestamp")
 
     # Step 4b: Reconstructure DataFrame to ensure data are sorted by timestamp
     df = df.sort_index()
