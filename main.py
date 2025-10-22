@@ -62,12 +62,13 @@ if __name__ == "__main__":
     csv_file_path = r"Exness_EURUSDc_2025_09.csv"
     df = CSVTickDataLoader.load(
         file_path=csv_file_path,
-        index_col=0,
         header=None,
-        names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
         usecols=["Timestamp", "Bid", "Ask"],
         parse_dates=True,
-        date_format="ISO8601",
+        sep=",",
+        decimal=".",
+        index_col="Timestamp",
+        date_parser=lambda x: pd.to_datetime(x, format="ISO8601"),
     )
 
     # Step 4b: Reconstructure DataFrame to ensure data are sorted by timestamp
