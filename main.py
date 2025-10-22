@@ -13,7 +13,7 @@ from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
 from nautilus_trader.model import Bar, BarType, Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
-from nautilus_trader.persistence.wranglers import BarDataWrangler
+from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 from strategies.pdhl import PDHLConfig, PDHLStrategy
 
@@ -121,11 +121,15 @@ if __name__ == "__main__":
     )
 
     # Step 4d: `BarDataWrangler` converts each row object of type `Bar`
-    wrangler = BarDataWrangler(EURUSD_15MIN_BARTYPE, EURUSD_INSTRUMENT)
-    eurusdc_15min_bars_list: list[Bar] = wrangler.process(df)
+    # wrangler = BarDataWrangler(EURUSD_15MIN_BARTYPE, EURUSD_INSTRUMENT)
+    wrangler = QuoteTickDataWrangler(instrument=EURUSD_INSTRUMENT)
+    ticks = wrangler.process_bar_data(
+        bid_data=df["Bid"], ask_data=df["Ask"]
+    )
+    # eurusdc_15min_bars_list: list[Bar] = wrangler.process(df)
 
     # Step 4e: Add loaded data to the engine
-    engine.add_data(eurusdc_15min_bars_list)
+    engine.add_data(ticks)
 
     # Step 5: Create strategy and add it to engine
     config = PDHLConfig(
