@@ -1,11 +1,11 @@
 from decimal import Decimal
-from nautilus_trader.model import Bar, BarType, InstrumentId, Position, Quantity
+from nautilus_trader.model import Bar, BarType, InstrumentId, Position
 from nautilus_trader.trading.strategy import Strategy, StrategyConfig
 
 
 class PDHLConfig(StrategyConfig):
     instrument_id: InstrumentId
-    trade_size: Decimal
+    risk_per_trade: Decimal
 
 
 class PDHLStrategy(Strategy):
@@ -16,7 +16,7 @@ class PDHLStrategy(Strategy):
         super().__init__()
 
         self.instrument_id = config.instrument_id
-        self.trade_size = Quantity.from_int(config.trade_size)
+        self.risk_per_trade = Decimal(config.risk_per_trade)
 
         # Trading states
         self.position: Position | None = None

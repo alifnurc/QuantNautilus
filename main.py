@@ -8,7 +8,7 @@ from decimal import Decimal
 from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-from nautilus_trader.model import BarType, Money, TraderId, Venue
+from nautilus_trader.model import Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # Step 5: Create strategy and add it to engine
     config = PDHLConfig(
         instrument_id=EURUSD_INSTRUMENT.id,
-        trade_size=Decimal(10_000),
+        risk_per_trade=Decimal(10000.00),
     )
 
     strategy = PDHLStrategy(config=config)
