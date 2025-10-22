@@ -69,6 +69,7 @@ if __name__ == "__main__":
         na_values=["", "NULL", "NaN", "N/A"],
     )
 
+    # Step 4b: Restructur DataFrame into required structure
     # Convert string timestamps into datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Rename column to required name
@@ -76,22 +77,16 @@ if __name__ == "__main__":
     # Seet column `Timestamp` as index
     df = df.set_index("timestamp")
 
-    # Step 4c: Define type of loaded bars
-    EURUSD_15MIN_BARTYPE = BarType.from_str(
-        f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL",
-    )
-
-    # Step 4d: Process quotes using a wrangler
+    # Step 4c: Process quotes using a wrangler
     wrangler = QuoteTickDataWrangler(instrument=EURUSD_INSTRUMENT)
     ticks = wrangler.process(df)
 
-    # Step 4e: Add loaded data to the engine
+    # Step 4d: Add loaded data to the engine
     engine.add_data(ticks)
 
     # Step 5: Create strategy and add it to engine
     config = PDHLConfig(
         instrument_id=EURUSD_INSTRUMENT.id,
-        bar_type=BarType.from_str(f"{EURUSD_INSTRUMENT.id}-15-MINUTE-MID-EXTERNAL"),
         trade_size=Decimal(10_000),
     )
 
@@ -100,11 +95,6 @@ if __name__ == "__main__":
 
     # Step 6: Run engine = Run backtest
     engine.run()
-
-    # Generating reports
-    engine.trader.generate_account_report(EXNESS)
-    engine.trader.generate_order_fills_report()
-    engine.trader.generate_positions_report()
 
     # Step 7: Release system resources
     engine.dispose()

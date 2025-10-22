@@ -1,5 +1,5 @@
 from decimal import Decimal
-from nautilus_trader.model import Bar, InstrumentId, Position, Quantity
+from nautilus_trader.model import Bar, BarType, InstrumentId, Position, Quantity
 from nautilus_trader.trading.strategy import Strategy, StrategyConfig
 
 
@@ -26,7 +26,12 @@ class PDHLStrategy(Strategy):
         self.pdhl_is_taken: bool = False
 
     def on_start(self):
-        self.log.info("Strategu started")
+        # Create 15-minute bars from BID prices (in QuoteTick objects)
+        bar_type = BarType.from_str(f"{self.instrument_id}-15-MINUTE-BID-EXTERNAL")
+
+        # Request historical data and subscribe to live data
+        self.request_bars(bar_type)
+        self.subscribe(bar_type)
 
     def on_stop(self):
         self.log.info("Strategy stopped")
@@ -34,3 +39,11 @@ class PDHLStrategy(Strategy):
     def on_bar(self, bar: Bar):
         if bar.instrument_id != self.instrument_id:
             return
+        print("The bar is: ", bar)
+
+    def on_order_filled(self, filled_order):
+        self.position = self.cache.position_for_order(filled_order.client_order_id)
+
+        if self.position:
+            self.entry_price = float(self.position.avg_px_open)
+            self.log.info(f"Position opened: {self.position}")
