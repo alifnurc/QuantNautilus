@@ -64,6 +64,10 @@ if __name__ == "__main__":
         header=None,
         sep=",",
         decimal=".",
+        dtype={
+            "Bid": "float64",
+            "Ask": "float64",
+        },
     )
 
     # Change order of columns
