@@ -66,6 +66,7 @@ if __name__ == "__main__":
         decimal=".",
         names=["Exness", "Symbol", "Timestamp", "Bid", "Ask"],
         usecols=["Timestamp", "Bid", "Ask"],
+        na_values=["", "NULL", "NaN", "N/A"],
     )
 
     # Convert string timestamps into datetime
