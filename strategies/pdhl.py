@@ -1,6 +1,7 @@
 import pandas as pd
 
 from decimal import Decimal
+from nautilus_trader.common.enums import LogColor
 from nautilus_trader.model import Bar, BarType, InstrumentId, Position
 from nautilus_trader.trading.strategy import Strategy, StrategyConfig
 
@@ -42,8 +43,9 @@ class PDHLStrategy(Strategy):
         self.log.info(
             f"Received bar - Type: {bar.bar_type}, Instrument: {bar.instrument_id}"
         )
-        if bar.instrument_id != self.instrument_id:
-            return
+        self.log.info(repr(bar), LogColor.CYAN)
+        # if bar.instrument_id != self.instrument_id:
+        #     return
 
         self.log.info(f"Bar: {bar.open}, {bar.high}, {bar.low}, {bar.close}")
 
