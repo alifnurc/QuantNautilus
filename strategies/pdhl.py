@@ -2,7 +2,7 @@ import pandas as pd
 
 from decimal import Decimal
 from nautilus_trader.common.enums import LogColor
-from nautilus_trader.model import Bar, BarType, InstrumentId, Position
+from nautilus_trader.model import Bar, BarType, InstrumentId, Position, QuoteTick
 from nautilus_trader.trading.strategy import Strategy, StrategyConfig
 
 
@@ -48,6 +48,9 @@ class PDHLStrategy(Strategy):
         #     return
 
         self.log.info(f"Bar: {bar.open}, {bar.high}, {bar.low}, {bar.close}")
+
+    def on_quote_tick(self, tick: QuoteTick):
+        self.log.info(f"Received quote tick: {tick}, Instrument: {tick.instrument_id}")
 
     def on_order_filled(self, filled_order):
         self.position = self.cache.position_for_order(filled_order.client_order_id)
