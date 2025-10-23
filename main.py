@@ -8,9 +8,11 @@ from decimal import Decimal
 from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
+from nautilus_trader.data.aggregation import ValueBarAggregrator
 from nautilus_trader.model import BarType, Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
+from nautilus_trader.model.data import BarSpecification
 from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 from nautilus_trader.examples.strategies.ema_cross import EMACross, EMACrossConfig
@@ -83,8 +85,18 @@ if __name__ == "__main__":
     wrangler = QuoteTickDataWrangler(instrument=EURUSD_INSTRUMENT)
     ticks = wrangler.process(df)
 
+    handler = []
+    bar_type = BarType.from_str(f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL")
+    aggregator = ValueBarAggregrator(
+        EURUSD_INSTRUMENT,
+        bar_type,
+        handler.append,
+    )
+
+    aggregator.handle_quote_tick(ticks)
+
     # Step 4d: Add loaded data to the engine
-    engine.add_data(ticks)
+    engine.add_data(aggregator)
 
     # Step 5: Create strategy and add it to engine
     config = EMACrossConfig(
