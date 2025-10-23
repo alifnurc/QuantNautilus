@@ -8,12 +8,12 @@ from decimal import Decimal
 from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-from nautilus_trader.model import Money, TraderId, Venue
+from nautilus_trader.model import BarType, Money, TraderId, Venue
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
-from strategies.pdhl import PDHLConfig, PDHLStrategy
+from nautilus_trader.examples.strategies.ema_cross import EMACross, EMACrossConfig
 
 
 def download(url: str) -> None:
@@ -87,12 +87,15 @@ if __name__ == "__main__":
     engine.add_data(ticks)
 
     # Step 5: Create strategy and add it to engine
-    config = PDHLConfig(
+    config = EMACrossConfig(
         instrument_id=EURUSD_INSTRUMENT.id,
-        risk_per_trade=Decimal(10000.00),
+        bar_type=BarType.from_str(f"{EURUSD_INSTRUMENT.id}-15-MINUTE-MID-EXTERNAL"),
+        fast_ema_period=10,
+        slow_ema_period=20,
+        trade_size=Decimal(10_000),
     )
 
-    strategy = PDHLStrategy(config=config)
+    strategy = EMACross(config=config)
     engine.add_strategy(strategy=strategy)
 
     # Step 6: Run engine = Run backtest
