@@ -41,7 +41,8 @@ class PDHLStrategy(Strategy):
     def on_bar(self, bar: Bar):
         if bar.instrument_id != self.instrument_id:
             return
-        print("The bar is: ", bar)
+
+        self.log.info(f"Bar: {bar.open}, {bar.high}, {bar.low}, {bar.close}")
 
     def on_order_filled(self, filled_order):
         self.position = self.cache.position_for_order(filled_order.client_order_id)
