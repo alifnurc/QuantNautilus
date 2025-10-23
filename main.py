@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # Step 1: Configure and create backtest engine
     engine_config = BacktestEngineConfig(
         trader_id=TraderId("BACKTEST_TRADER-001"),
-        logging=LoggingConfig(log_level="DEBUG"),
+        logging=LoggingConfig(log_level="INFO"),
     )
     engine = BacktestEngine(config=engine_config)
 
@@ -73,7 +73,9 @@ if __name__ == "__main__":
     # Convert string timestamps into datetime
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="ISO8601")
     # Rename column to required name
-    df = df.rename(columns={"Timestamp": "timestamp", "Bid": "bid_price", "Ask": "ask_price"})
+    df = df.rename(
+        columns={"Timestamp": "timestamp", "Bid": "bid_price", "Ask": "ask_price"}
+    )
     # Seet column `Timestamp` as index
     df = df.set_index("timestamp")
 
