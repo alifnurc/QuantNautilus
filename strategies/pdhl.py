@@ -39,10 +39,10 @@ class PDHLStrategy(Strategy):
         self.log.info("Strategy stopped")
 
     def on_bar(self, bar: Bar):
+        self.log.info(
+            f"Received bar - Type: {bar.bar_type}, Instrument: {bar.instrument_id}"
+        )
         if bar.instrument_id != self.instrument_id:
-            print(
-                f"Received bar - Type: {bar.bar_type}, Instrument: {bar.instrument_id}"
-            )
             return
 
         self.log.info(f"Bar: {bar.open}, {bar.high}, {bar.low}, {bar.close}")
