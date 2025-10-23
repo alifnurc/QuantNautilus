@@ -1,3 +1,5 @@
+import pandas as pd
+
 from decimal import Decimal
 from nautilus_trader.model import Bar, BarType, InstrumentId, Position
 from nautilus_trader.trading.strategy import Strategy, StrategyConfig
@@ -30,8 +32,8 @@ class PDHLStrategy(Strategy):
         bar_type = BarType.from_str(f"{self.instrument_id}-15-MINUTE-BID-EXTERNAL")
 
         # Request historical data and subscribe to live data
-        self.request_bars(bar_type)
-        self.subscribe(bar_type)
+        self.request_bars(bar_type, start=self.clock.utc_now() - pd.Timedelta(days=1))
+        self.subscribe_bars(bar_type)
 
     def on_stop(self):
         self.log.info("Strategy stopped")
