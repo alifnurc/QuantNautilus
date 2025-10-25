@@ -8,9 +8,9 @@ from decimal import Decimal
 from pathlib import Path
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
-from nautilus_trader.data.aggregation import ValueBarAggregrator
+from nautilus_trader.data.aggregation import ValueBarAggregator
 from nautilus_trader.model import BarType, Money, TraderId, Venue
-from nautilus_trader.model.enums import AccountType, OmsType
+from nautilus_trader.model.enums import AccountType, OmsType, BarAggregation, PriceType
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.model.data import BarSpecification
 from nautilus_trader.persistence.wranglers import QuoteTickDataWrangler
@@ -86,8 +86,9 @@ if __name__ == "__main__":
     ticks = wrangler.process(df)
 
     handler = []
-    bar_type = BarType.from_str(f"{EURUSD_INSTRUMENT.id}-15-MINUTE-BID-EXTERNAL")
-    aggregator = ValueBarAggregrator(
+    bar_spec = BarSpecification(15, BarAggregation.TICK, PriceType.BID)
+    bar_type = BarType.from_str(EURUSD_INSTRUMENT.id, bar_spec)
+    aggregator = ValueBarAggregator(
         EURUSD_INSTRUMENT,
         bar_type,
         handler.append,
