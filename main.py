@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ticks = wrangler.process(df)
 
     handler = []
-    bar_spec = BarSpecification(15, BarAggregation.TICK, PriceType.BID)
+    bar_spec = BarSpecification(15, BarAggregation.MINUTE, PriceType.BID)
     bar_type = BarType(EURUSD_INSTRUMENT.id, bar_spec)
     aggregator = ValueBarAggregator(
         EURUSD_INSTRUMENT,
@@ -94,7 +94,8 @@ if __name__ == "__main__":
         handler.append,
     )
 
-    aggregator.handle_quote_tick(ticks)
+    for tick in ticks:
+        aggregator.handle_quote_tick(tick)
 
     # Step 4d: Add loaded data to the engine
     engine.add_data(aggregator)
