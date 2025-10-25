@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     handler = []
     bar_spec = BarSpecification(15, BarAggregation.TICK, PriceType.BID)
-    bar_type = BarType.from_str(EURUSD_INSTRUMENT.id, bar_spec)
+    bar_type = BarType(EURUSD_INSTRUMENT.id, bar_spec)
     aggregator = ValueBarAggregator(
         EURUSD_INSTRUMENT,
         bar_type,
